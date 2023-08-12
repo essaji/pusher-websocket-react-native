@@ -274,7 +274,26 @@ export class Pusher {
   }
 
   public async disconnect() {
-    return await PusherWebsocketReactNative.disconnect();
+    await PusherWebsocketReactNative.disconnect();
+
+    // remove all previous listeners
+    this.pusherEventEmitter.removeAllListeners(
+      'PusherReactNative:onAuthorizer'
+    );
+    this.pusherEventEmitter.removeAllListeners('PusherReactNative:onError');
+    this.pusherEventEmitter.removeAllListeners('PusherReactNative:onEvent');
+    this.pusherEventEmitter.removeAllListeners(
+      'PusherReactNative:onMemberAdded'
+    );
+    this.pusherEventEmitter.removeAllListeners(
+      'PusherReactNative:onMemberRemoved'
+    );
+
+    // unsubscribe from all channels
+    const channelsCopy = new Map(this.channels);
+    channelsCopy.forEach((channel) => {
+      this.unsubscribe({ channelName: channel.channelName });
+    });
   }
 
   async subscribe(args: {
