@@ -174,6 +174,8 @@ export class Pusher {
     onMemberAdded?: (channelName: string, member: PusherMember) => void;
     onMemberRemoved?: (channelName: string, member: PusherMember) => void;
   }) {
+    this.resetPusherInstance(); // Reset previous pusher instance if any before initializing a new one.
+
     this.addListener(EVENT_TYPE.ON_CONNECTION_STATE_CHANGE, (event: any) => {
       this.connectionState = event.currentState.toUpperCase();
       args.onConnectionStateChange?.(
@@ -289,6 +291,7 @@ export class Pusher {
   }
 
   public async disconnect() {
+    this.resetPusherInstance();
     return await PusherWebsocketReactNative.disconnect();
   }
 
@@ -307,7 +310,7 @@ export class Pusher {
     this.pusherEventEmitter.removeAllListeners(EVENT_TYPE.ON_MEMBER_REMOVED);
   }
 
-  public async resetPusherInstance() {
+  public resetPusherInstance() {
     this.removeAllListeners();
     this.unsubscribeAllChannels();
   }
